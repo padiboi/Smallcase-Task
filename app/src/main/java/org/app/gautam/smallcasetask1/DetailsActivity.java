@@ -1,28 +1,45 @@
 package org.app.gautam.smallcasetask1;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.android.volley.Cache;
-import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by gautam on 03/02/18.
@@ -41,13 +58,17 @@ public class DetailsActivity extends AppCompatActivity {
     private String imgType = ".png";
     private int smallcase_no = -1;
 
-    TextView rationale_tv, index_tv, yearet_tv, moret_tv, title_tv;
-    private static String jsonString;
+    private TextView rationale_tv, index_tv, yearet_tv, moret_tv, title_tv, ra_title;
+    private LineChart chart;
+    private List<Entry> entries = new ArrayList<Entry>();
+    private ScrollView cl;
+    SharedPreferences cache;
+    SharedPreferences.Editor cacheEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.details_activity);
+        setContentView(R.layout.new_details_activity);
 
         Bundle b = getIntent().getExtras();
         if(b != null)
@@ -62,69 +83,168 @@ public class DetailsActivity extends AppCompatActivity {
         yearet_tv = (TextView) findViewById(R.id.detail_1yr_ret);
         moret_tv = (TextView) findViewById(R.id.detail_1mo_ret);
         title_tv = (TextView) findViewById(R.id.detail_title);
-        fetchSmallcaseDetails();
+        ra_title = (TextView) findViewById(R.id.rationale_title);
+        cache = getApplicationContext().getSharedPreferences("cache", MODE_PRIVATE);
+        cl = (ScrollView) findViewById(R.id.layout);
 
+        fetchSmallcaseDetails();
+        fetchHistoricData();
     }
 
-    private void updateUI() {
-
-        rationale_tv.setText(jsonString);
-
-        try {
-            JSONObject json = new JSONObject(jsonString);
-            JSONObject data = json.getJSONObject("data");
-            JSONObject stats = data.getJSONObject("stats");
-            JSONObject returns = stats.getJSONObject("returns");
-
-            title_tv.setText(data.getJSONObject("info").getString("name"));
-
-            rationale_tv.setText(data.getString("rationale"));
-
-            index_tv.setText(roundTwoDecimals(stats.getDouble("indexValue")) + "");
-            moret_tv.setText(roundTwoDecimals(returns.getDouble("monthly")) + "%");
-            yearet_tv.setText(roundTwoDecimals(returns.getDouble("yearly")) + "%");
-
-        }catch (JSONException j){
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(!isNetworkAvailable()) {
+            Snackbar.make(cl, "App is offline", Snackbar.LENGTH_LONG).show();
         }
+    }
 
+    private void updateUI(String jsonString) {
+
+        if(!(jsonString.compareTo("null") == 0)) {
+            try {
+                JSONObject json = new JSONObject(jsonString);
+                JSONObject data = json.getJSONObject("data");
+                JSONObject stats = data.getJSONObject("stats");
+                JSONObject returns = stats.getJSONObject("returns");
+                ra_title.setText("Rationale");
+                title_tv.setText(data.getJSONObject("info").getString("name"));
+
+                rationale_tv.setText(data.getString("rationale"));
+
+                index_tv.setText("Index : " + roundTwoDecimals(stats.getDouble("indexValue")) + "");
+                moret_tv.setText("1 Month : " + roundTwoDecimals(returns.getDouble("monthly")) + "%");
+                yearet_tv.setText("1 Year : " + roundTwoDecimals(returns.getDouble("yearly")) + "%");
+
+            } catch (JSONException j) {
+                rationale_tv.setText("Could not parse server response");
+                Log.i("gpexception", j.getMessage());
+            }
+        }
     }
 
     private void fetchSmallcaseDetails(){
 
-        RequestQueue mRequestQueue;
-        String url = dataBaseURL + smallcaseList[smallcase_no];
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+        final String sm_ID = smallcaseList[smallcase_no];
 
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
+        if(!isNetworkAvailable()){
+            String cachedData = cache.getString(sm_ID+"data", "null");
+            Log.i("gpreading", cachedData);
+            updateUI(cachedData);
+        }else {
 
-        // Instantiate the RequestQueue with the cache and network.
-        mRequestQueue = new RequestQueue(cache, network);
+            String url = dataBaseURL + sm_ID;
 
-        // Start the queue
-        mRequestQueue.start();
+            RequestQueue mRequestQueue = Volley.newRequestQueue(this);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            writeToCache(sm_ID + "data", response);
+                            Log.i("gpwriting", sm_ID + "data" + response);
+                            updateUI(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            });
+            mRequestQueue.add(stringRequest);
+        }
+
+    }
+
+    private void updateChart(String histString){
+
+        chart = (LineChart) findViewById(R.id.chart);
+
+        if(!(histString.compareTo("null") == 0)) {
+            try {
+                JSONObject json = new JSONObject(histString);
+                final JSONArray histArray = json.getJSONObject("data").getJSONArray("points");
+                final ArrayList<String> dates = new ArrayList<>();
+
+                for (int i = 0; i < histArray.length(); i++) {
+                    JSONObject j = histArray.getJSONObject(i);
+                    String date = (String) j.get("date");
+                    date = date.substring(0, 10);
+                    dates.add(date);
+                    long value = j.getLong("index");
+                    Entry e = new Entry(i, value);
+                    entries.add(e);
+                }
+
+                LineDataSet dataSet = new LineDataSet(entries, "Historic");
+                LineData lineData = new LineData(dataSet);
+
+                XAxis xAxis = chart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setDrawGridLines(false);
+                xAxis.setValueFormatter(new IAxisValueFormatter() {
                     @Override
-                    public void onResponse(String response) {
-                        jsonString = response;
-                        updateUI();
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        return dates.get((int) value);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                jsonString = "null";
-            }
-        });
-        mRequestQueue.add(stringRequest);
+                });
+                chart.invalidate();
+                chart.setData(lineData);
 
+            } catch (JSONException j) {
+                Log.i("gpexception", j.getMessage());
+            }
+        }
+
+    }
+
+    private void fetchHistoricData(){
+
+        final String sm_ID = smallcaseList[smallcase_no];
+
+        if(!isNetworkAvailable()) {
+            String cachedData = cache.getString(sm_ID+"hist", "null");
+            Log.i("gpreading", cachedData);
+            updateChart(cachedData);
+        }else {
+
+            String url = histBaseURL + sm_ID;
+
+            RequestQueue mRequestQueue = Volley.newRequestQueue(this);
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            writeToCache(sm_ID + "hist", response);
+                            Log.i("gpwriting", sm_ID + "hist" + response);
+                            updateChart(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+            mRequestQueue.add(stringRequest);
+        }
+
+    }
+
+    private void writeToCache(String key, String response) {
+        cacheEditor = cache.edit();
+        cacheEditor.putString(key, response).apply();
     }
 
     Double roundTwoDecimals(Double f) {
         DecimalFormat twoDForm = new DecimalFormat("#.##");
         return Double.valueOf(twoDForm.format(f));
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 }

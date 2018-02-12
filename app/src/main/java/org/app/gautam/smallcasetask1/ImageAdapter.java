@@ -1,6 +1,8 @@
 package org.app.gautam.smallcasetask1;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +37,14 @@ public class ImageAdapter extends ArrayAdapter {
         }
 
         String url = imgBaseURL + smallcases[position] + imgType;
-
         Picasso.with(mContext).load(url).fit().into((ImageView) view);
         return view;
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

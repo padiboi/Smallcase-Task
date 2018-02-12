@@ -1,102 +1,97 @@
-{ "success": true,
+{
+  "success": true,
   "errors": null,
   "data": {
-    "_id": "5704fb528cedad2432b3ca54",
-    "rationale": "<p>EarningsTEST in the income statements of companies can sometimes be misleading. Many celebrated investors like Warren Buffet have argued in favour of using free cash-flow over other criteria. Free cash-flow gives an idea about the cash position of the company by subtracting the investments from the cash generated from operations. Free cash flow is very transparent as it reflects the exact cash position of the company making valuation easy and simple. This smallcase consists of cash-rich companies which are growing their free cash flow and reducing debt burden, yet are available at lower valuations.</p>",
-    "scid": "SCMO_0001",
+    "_id": "5704fb528cedad2432b3ca55",
+    "rationale": "This smallcase is designed for a layman investor and consists of stocks which boast of strong financial position, manageable debt and stable earnings. It is based on Benjamin Graham's investment philosophy. Also Warren Buffett's mentor, Graham is widely known as the father of value investing. His belief - that inexperienced equity investors should invest into conservatively financed companies with long history of profitable operations - is reflected in this smallcase.",
+    "scid": "SCMO_0002",
     "segments": [],
     "constituents": [],
-    "flags": {
-      "featured": {
-        "value": false
-      },
-      "active": true,
-      "popular": {
-        "value": false,
-        "rank": 22
-      }
-    },
     "info": {
       "tags": [],
+      "tier": null,
       "rebalanceSchedule": "quarterly",
       "uploaded": "2016-04-04T00:00:00.000Z",
       "blogURL": null,
-      "tier": null,
       "nextUpdate": "2018-02-27T00:00:00.000Z",
       "updated": "2017-11-29T00:00:00.000Z",
       "created": "2014-03-03T00:00:00.000Z",
       "creator": "smallcaseHQ",
-      "shortDescription": "Low-debt, cash-rich companies at attractive valuations",
-      "name": "Cash Cows at Bargain",
+      "shortDescription": "Quality stocks at low valuations",
+      "name": "Bargain Buys",
       "type": "Model-based"
     },
-    "__v": 31,
+    "__v": 30,
     "stats": {
       "returns": {
-        "daily": -0.0505172434993822,
-        "monthly": -0.08407514167280723,
-        "yearly": 0.44325650564250935
+        "daily": 0.02233399820950813,
+        "monthly": -0.0779243623427164,
+        "yearly": 1.0485452585312414
       },
-      "indexValue": 528.0298251543685,
-      "unadjustedIndex": 528.0298251543685,
-      "lastCloseIndex": 556.123659475879,
-      "divReturns": 8.85048356272277,
-      "minInvestAmount": 7318.15
+      "indexValue": 576.2557812248382,
+      "unadjustedIndex": 576.2557812248382,
+      "lastCloseIndex": 563.6668468759516,
+      "divReturns": 12.8409689545478,
+      "minInvestAmount": 6425.7
+    },
+    "flags": {
+      "featured": {
+        "value": true,
+        "rank": 6
+      },
+      "active": true,
+      "popular": {
+        "value": true,
+        "rank": 6
+      }
     },
     "version": 7,
     "updates": [
       {
         "label": "Quarterly Update: Stocks Change",
-        "rationale": "2 stocks have been added, 4 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
+        "rationale": "3 stocks have been added and 3 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
         "date": "2017-11-29T00:00:00.000Z",
         "version": 7
       },
       {
         "label": "Quarterly Update: Stocks Change",
-        "rationale": "6 stocks have been added, 4 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
+        "rationale": "2 stocks have been added and 2 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
         "date": "2017-08-31T00:00:00.000Z",
         "version": 6
       },
       {
         "label": "Quarterly Update: Stocks Change",
-        "rationale": "3 stocks have been added, 8 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
+        "rationale": "2 stocks have been added and 1 stock has been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
         "date": "2017-05-31T00:00:00.000Z",
         "version": 5
       },
       {
-        "label": "Quarterly Update: Stocks Change",
-        "rationale": "5 stocks have been added, 5 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
+        "label": "Quarterly Update: Weights Rebalance",
+        "rationale": "There are no changes in the stocks or weighting scheme of this smallcase for this quarter. The weights in which you hold stocks might have changed due to changing prices, apply this update to move back to the prescribed weights",
         "date": "2017-02-28T00:00:00.000Z",
         "version": 4
       },
       {
         "label": "Quarterly Update: Stocks Change",
-        "rationale": "8 stocks have been added, 4 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
+        "rationale": "2 stocks have been added and 1 stock has been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
         "date": "2016-11-30T00:00:00.000Z",
         "version": 3
       },
       {
         "label": "Quarterly Update: Stocks Change",
-        "rationale": "10 stocks have been added and 8 stocks have been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
-        "date": "2016-09-05T14:01:18.456Z",
+        "rationale": "1 stock has been dropped as suggested by the model & criteria used for this smallcase for the next quarter",
+        "date": "2016-09-05T14:01:18.478Z",
         "version": 2
       }
     ],
-    "newsTag": "cash cows at bargain mo_1",
+    "newsTag": "bargain buys mo_2",
     "keywords": [
-      "National Fertilizers",
-      "Max Financial Services",
-      "Indian Metals and Ferro Alloys",
-      "E.I.D-Parry India",
-      "E.I.D-Parry",
-      "EID Parry",
-      "Gujarat Narmada Valley Fertilizers & Chemicals",
-      "NHPC",
-      "JK Paper",
+      "Grasim Industries",
       "SJVN",
-      "Tata Chemicals",
-      "NIIT Technologies",
-      "NIIT Tech"
+      "Vardhman Textiles",
+      "Gujarat State Fertilizers and Chemicals",
+      "J B Chemicals and Pharmaceuticals",
+      "JB Chemicals"
     ]
   }
 }
