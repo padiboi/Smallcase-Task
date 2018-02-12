@@ -5,12 +5,9 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -28,7 +25,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -36,9 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,18 +46,18 @@ public class DetailsActivity extends AppCompatActivity {
             "SCNM_0007", "SCNM_0008", "SCNM_0009", "SCMO_0001"
     };
 
-    private String imgBaseURL = "https://www.smallcase.com/images/smallcases/187/";
-    private String dataBaseURL = "https://api-dev.smallcase.com/smallcases/smallcase?scid=";
-    private String histBaseURL = "https://api-dev.smallcase.com/smallcases/historical?scid=";
-    private String imgType = ".png";
+    private static final String imgBaseURL = "https://www.smallcase.com/images/smallcases/187/";
+    private static final String dataBaseURL = "https://api-dev.smallcase.com/smallcases/smallcase?scid=";
+    private static final String histBaseURL = "https://api-dev.smallcase.com/smallcases/historical?scid=";
+    private static final String imgType = ".png";
     private int smallcase_no = -1;
 
     private TextView rationale_tv, index_tv, yearet_tv, moret_tv, title_tv, ra_title;
     private LineChart chart;
     private List<Entry> entries = new ArrayList<Entry>();
     private ScrollView cl;
-    SharedPreferences cache;
-    SharedPreferences.Editor cacheEditor;
+    private SharedPreferences cache;
+    private SharedPreferences.Editor cacheEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +65,7 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.new_details_activity);
 
         Bundle b = getIntent().getExtras();
-        if(b != null)
+        if (b != null)
             smallcase_no = b.getInt("index");
 
         String url = imgBaseURL + smallcaseList[smallcase_no] + imgType;
@@ -94,14 +88,14 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(!isNetworkAvailable()) {
+        if (!isNetworkAvailable()) {
             Snackbar.make(cl, "App is offline", Snackbar.LENGTH_LONG).show();
         }
     }
 
     private void updateUI(String jsonString) {
 
-        if(!(jsonString.compareTo("null") == 0)) {
+        if (!(jsonString.compareTo("null") == 0)) {
             try {
                 JSONObject json = new JSONObject(jsonString);
                 JSONObject data = json.getJSONObject("data");
@@ -123,15 +117,14 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void fetchSmallcaseDetails(){
+    private void fetchSmallcaseDetails() {
 
         final String sm_ID = smallcaseList[smallcase_no];
 
-        if(!isNetworkAvailable()){
-            String cachedData = cache.getString(sm_ID+"data", "null");
-            Log.i("gpreading", cachedData);
+        if (!isNetworkAvailable()) {
+            String cachedData = cache.getString(sm_ID + "data", "null");
             updateUI(cachedData);
-        }else {
+        } else {
 
             String url = dataBaseURL + sm_ID;
 
@@ -142,7 +135,6 @@ public class DetailsActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             writeToCache(sm_ID + "data", response);
-                            Log.i("gpwriting", sm_ID + "data" + response);
                             updateUI(response);
                         }
                     }, new Response.ErrorListener() {
@@ -155,11 +147,11 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-    private void updateChart(String histString){
+    private void updateChart(String histString) {
 
         chart = (LineChart) findViewById(R.id.chart);
 
-        if(!(histString.compareTo("null") == 0)) {
+        if (!(histString.compareTo("null") == 0)) {
             try {
                 JSONObject json = new JSONObject(histString);
                 final JSONArray histArray = json.getJSONObject("data").getJSONArray("points");
@@ -197,15 +189,14 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-    private void fetchHistoricData(){
+    private void fetchHistoricData() {
 
         final String sm_ID = smallcaseList[smallcase_no];
 
-        if(!isNetworkAvailable()) {
-            String cachedData = cache.getString(sm_ID+"hist", "null");
-            Log.i("gpreading", cachedData);
+        if (!isNetworkAvailable()) {
+            String cachedData = cache.getString(sm_ID + "hist", "null");
             updateChart(cachedData);
-        }else {
+        } else {
 
             String url = histBaseURL + sm_ID;
 
@@ -216,13 +207,12 @@ public class DetailsActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             writeToCache(sm_ID + "hist", response);
-                            Log.i("gpwriting", sm_ID + "hist" + response);
                             updateChart(response);
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-
+                    Log.i("gperror", error.getMessage());
                 }
             });
             mRequestQueue.add(stringRequest);
